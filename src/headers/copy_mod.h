@@ -1,0 +1,8 @@
+//
+// Created by lowern1ght on 06.06.2023.
+//
+
+#ifndef COPY_MOD_SRC_MODULES_COPY_MOD_H
+#define COPY_MOD_SRC_MODULES_COPY_MOD_H
+
+#endif //COPY_MOD_SRC_MODULES_COPY_MOD_H

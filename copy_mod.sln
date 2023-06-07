@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "copy_mod", "copy_mod\copy_mod.csproj", "{A6E5D4D6-3610-4A6F-AB96-DF0F211EBDFF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6E5D4D6-3610-4A6F-AB96-DF0F211EBDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6E5D4D6-3610-4A6F-AB96-DF0F211EBDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6E5D4D6-3610-4A6F-AB96-DF0F211EBDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6E5D4D6-3610-4A6F-AB96-DF0F211EBDFF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
