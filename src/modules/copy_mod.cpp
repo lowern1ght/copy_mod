@@ -18,16 +18,24 @@ const char *copy_exception::what() const {
   return exception::what();
 }
 
-void clear() {
-#if defined_WIN32
-  system("cls");
-#elif defined __LINUX__
-  std::cout << "\x1B[2J\x1B[H";
-#endif
-}
 
-void copy_mod::check_values_hash() {
-  config->logger->write_message(" **** Begin check HASH ***", info);
+
+void copy_mod::check_values_hash(path* pth_to, path* pth_from) {
+  config->logger->write_message(" **** Begin check HASH *** \n", info);
+
+  return; // developing...
+
+  if (is_directory(*pth_to)) {
+    for (auto entity_from : recursive_directory_iterator(*pth_from)) {
+      for (auto entity_to : recursive_directory_iterator(*pth_to)) {
+        cout << hash_value(entity_from.path()) << " | " << hash_value(entity_to.path()) << '\n';
+      }
+    }
+  }
+  else {
+    cout << hash_value(*pth_to) << " | " << hash_value(*pth_from) << '\n';
+  }
+
 }
 
 int get_count_elements(path* path_to_entity) {
@@ -53,9 +61,8 @@ string get_directory_name(path* pth)
   return dir_name;
 }
 
-void copy_mod::start_copy() {
-  clear();
-
+void copy_mod::start_copy()
+{
   if (is_directory(*config->to_copy)) {
     auto name_dir = get_directory_name(config->from_entity_copy);
     config->to_copy = new path(*config->to_copy / name_dir);
@@ -71,12 +78,8 @@ void copy_mod::start_copy() {
 
   copy(*config->from_entity_copy, *config->to_copy, copy_options::overwrite_existing | copy_options::recursive);
 
-  for (auto entity : recursive_directory_iterator()) {
-
-  }
-
   if (config->check_hash) {
-    check_values_hash();
+    check_values_hash(config->from_entity_copy, config->to_copy);
   }
 }
 

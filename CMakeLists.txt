@@ -18,4 +18,4 @@ if (OpenSSL_FOUND)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenSSL_LIBRARIES})
 endif ()
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
+set_target_properties(PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")

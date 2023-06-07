@@ -15,7 +15,7 @@ class copy_mod {
 private:
   copy_config* config;
 private:
-  void check_values_hash();
+  void check_values_hash(path* pth_to, path* pth_from);
 public:
   copy_mod(copy_config* config);
   void start_copy();

@@ -42,12 +42,16 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
     }
   }
 
+  if (first == DSTRING_EMPTY) {
+    first = arg;
+  }
+
   if (first == PARAM_NAME_COPY_TO    ||
       first == PARAM_NAME_COPY_FROM  ||
       first == PARAM_NAME_CHECK_ON   ||
       first == PARAM_NAME_LOG)
   {
-    return new pair<string, string>(first, clear_string(second));
+    return new pair<string, string>(first, second != DSTRING_EMPTY ? clear_string(second) : second);
   }
   else {
     return nullptr;
