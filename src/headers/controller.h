@@ -12,11 +12,12 @@
 #include <openssl/md5.h>
 
 using namespace std;
+using namespace filesystem;
 
 class controller {
 public:
-  std::string get_hash_summary(const std::filesystem::path entity);
-  std::string get_byte_entity(std::filesystem::path entity);
+  string static get_hash_summary(const path &entity);
+  string static get_byte_entity(const path &entity);
 };
 
 #endif //COPY_MOD_SRC_MODULES_CONTROLLER_H

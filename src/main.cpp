@@ -51,7 +51,7 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
     return new pair<string, string>(first, clear_string(second));
   }
   else {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -59,7 +59,7 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
   for (int i = 0; i < argc; ++i) {
     auto pair = get_pair_from_string(argv[i]);
 
-    if (pair != NULL) {
+    if (pair != nullptr) {
       arguments.insert(*pair);
     }
   }
@@ -68,13 +68,13 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
 copy_config* get_config_from_arguments(map<string, string> &arguments) {
   copy_config* config = new copy_config;
 
-  path* path_from_copy = NULL;
+  path* path_from_copy = nullptr;
 
-  if (arguments.count(name_arg_copy_from) == 1) {
+  if (arguments.count(PARAM_NAME_COPY_FROM) == 1) {
     try {
-      path_from_copy = new path(arguments.find(name_arg_copy_from)->second);
+      path_from_copy = new path(arguments.find(PARAM_NAME_COPY_FROM)->second);
     } catch(exception const &exception) {
-      throw;
+      throw new std::exception("*** Wrong path to _entity_ ***");
     }
 
     if (!filesystem::exists(*path_from_copy)) {
@@ -82,20 +82,20 @@ copy_config* get_config_from_arguments(map<string, string> &arguments) {
     }
   }
 
-  if (path_from_copy != NULL) {
+  if (path_from_copy != nullptr) {
     config->from_entity_copy = path_from_copy;
   }
 
-  path* paths_to_copy = NULL;
+  path* paths_to_copy = nullptr;
 
-  if (arguments.count(name_arg_copy_from) == 1) {
+  if (arguments.count(PARAM_NAME_COPY_TO) == 1) {
 
   }
 
-  if (arguments.count(name_arg_log) == 1) {
-    auto value_pair = arguments.find(name_arg_log)->second;
+  if (arguments.count(PARAM_NAME_LOG) == 1) {
+    auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
 
-    path* path_to_log_file = NULL;
+    path* path_to_log_file = nullptr;
     if (value_pair == STRING_EMPTY) {
       path_to_log_file = new path(current_path() / "log.txt");
     }
@@ -104,11 +104,11 @@ copy_config* get_config_from_arguments(map<string, string> &arguments) {
         path_to_log_file = new path(value_pair);
       }
       else {
-        path_to_log_file = new path(current_path() / "log.txt");
+        path_to_log_file = new path(current_path() / value_pair);
       }
     };
 
-    auto logger = new class logger(path_to_log_file, true);
+    logger* logger = new class logger(path_to_log_file, true);
     config->logger = logger;
   }
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
     config = get_config_from_arguments(arguments); //get config
   }
   catch (exception const error) {
-    cerr << error.what() << '\n';
+    cout << error.what() << '\n';
     return EXIT_FAILURE;
   }
 
