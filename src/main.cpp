@@ -3,10 +3,6 @@
  *
  * by lowern1ght
  *
- * argument list example:
- *
- *  --c="C:\Users\lowern1ght\Desktop\РучнойЧекККМ.ert" --p="point/to/copy/entity," (second)--log(="path/to/file/log.txt/.json/.log") --cmphs
- *
  * */
 
 #include <map>
@@ -16,6 +12,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <copy_config.h>
+#include <define_param.h>
 
 #define STRING_EMPTY ""
 
@@ -23,13 +20,6 @@ const char SYMBOL_SEPARATE = '=';
 
 using namespace std;
 using namespace filesystem;
-
-//arguments name
-
-const string name_arg_copy_from = "--c";
-const string name_arg_copy_to   = "--p";
-const string name_arg_log       = "--lg";
-const string name_arg_cmphs     = "--cmphs";
 
 string clear_string(const string &str, char symbol_remove = '"') {
   string result;
@@ -53,10 +43,11 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
     }
   }
 
-  if (first == name_arg_copy_from ||
-      first == name_arg_cmphs     ||
-      first == name_arg_copy_to   ||
-      first == name_arg_log) {
+  if (first == PARAM_NAME_COPY_TO    ||
+      first == PARAM_NAME_COPY_FROM  ||
+      first == PARAM_NAME_CHECK_ON   ||
+      first == PARAM_NAME_LOG)
+  {
     return new pair<string, string>(first, clear_string(second));
   }
   else {
