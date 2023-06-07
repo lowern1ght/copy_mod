@@ -13,8 +13,7 @@
 #include <filesystem>
 #include <copy_config.h>
 #include <define_param.h>
-
-#define STRING_EMPTY ""
+#include "copy_mod.h"
 
 const char SYMBOL_SEPARATE = '=';
 
@@ -32,7 +31,7 @@ string clear_string(const string &str, char symbol_remove = '"') {
 }
 
 pair<string, string>* get_pair_from_string(const string arg) noexcept {
-  string first = STRING_EMPTY, second = STRING_EMPTY;
+  string first = DSTRING_EMPTY, second = DSTRING_EMPTY;
 
   for (int i = 0; i < arg.length(); ++i) {
     if (arg[i] == SYMBOL_SEPARATE) {
@@ -55,7 +54,7 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
   }
 }
 
-void parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments) {
+void parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments) noexcept {
   for (int i = 0; i < argc; ++i) {
     auto pair = get_pair_from_string(argv[i]);
 
@@ -65,8 +64,46 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
   }
 }
 
-copy_config* get_config_from_arguments(map<string, string> &arguments) {
+copy_config *get_config_from_arguments(map<string, string> &arguments, logger* logger) {
   copy_config* config = new copy_config;
+
+  // ===============================================================================================
+
+  path* path_to_log_file = nullptr;
+
+  if (arguments.count(PARAM_NAME_LOG) == 1) {
+    auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
+
+    auto default_path = new path(current_path() / "log.txt");
+
+    /*if (value_pair == DSTRING_EMPTY) {
+      path_to_log_file = default_path;
+    }
+    else {
+      auto temp_path = new path(value_pair);
+      if (exists(temp_path->remove_filename()) && is_directory(temp_path->remove_filename())) {
+        path_to_log_file = temp_path;
+      }
+      else if (temp_path->is_relative()) {
+        path_to_log_file = new path(current_path() / temp_path->filename());
+      }
+      else {
+        path_to_log_file = default_path;
+      }
+    }*/
+
+    path_to_log_file = new path(current_path() / "log.txt");
+
+    logger = new class logger(path_to_log_file, true);
+    config->logger = logger;
+  }
+  else if(arguments.count(PARAM_NAME_LOG) > 1) {
+    logger->write_message("*** Argument [\" + PARAM_NAME_LOG + \"] specified more than once.", error);
+  }
+
+  logger->write_message(" --- LOGGER ACTIVE --- ", info);
+
+  // ===============================================================================================
 
   path* path_from_copy = nullptr;
 
@@ -74,42 +111,50 @@ copy_config* get_config_from_arguments(map<string, string> &arguments) {
     try {
       path_from_copy = new path(arguments.find(PARAM_NAME_COPY_FROM)->second);
     } catch(exception const &exception) {
-      throw new std::exception("*** Wrong path to _entity_ ***");
+      logger->write_message(" *** Wrong path to _entity_ *** ", logger_type::error);
     }
 
     if (!filesystem::exists(*path_from_copy)) {
-      throw new std::exception(" *** the creature that needs to be copied has not been found *** ");
+      logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
     }
+  }
+  else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
+    logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
   }
 
   if (path_from_copy != nullptr) {
     config->from_entity_copy = path_from_copy;
   }
 
-  path* paths_to_copy = nullptr;
+  // ===============================================================================================
+
+  path* path_to_copy = nullptr;
 
   if (arguments.count(PARAM_NAME_COPY_TO) == 1) {
-
-  }
-
-  if (arguments.count(PARAM_NAME_LOG) == 1) {
-    auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
-
-    path* path_to_log_file = nullptr;
-    if (value_pair == STRING_EMPTY) {
-      path_to_log_file = new path(current_path() / "log.txt");
+    path_to_copy = new path(arguments.find(PARAM_NAME_COPY_TO)->second);
+    if (filesystem::exists(*path_to_copy)) {
+      config->to_copy = path_to_copy;
+    }
+    //Todo: реализовать копирование в несколько папок (directories)
+    else if (arguments.count(PARAM_NAME_COPY_TO) > 1) {
+      logger->write_message(" *** Argument [" + PARAM_NAME_COPY_TO + "] specified more than once. *** ", error);
     }
     else {
-      if (exists(value_pair) && !filesystem::is_directory(value_pair)) {
-        path_to_log_file = new path(value_pair);
-      }
-      else {
-        path_to_log_file = new path(current_path() / value_pair);
-      }
-    };
+      logger->write_message("*** End point to copy is bad path ***", error);
+    }
+  }
 
-    logger* logger = new class logger(path_to_log_file, true);
-    config->logger = logger;
+  // ===============================================================================================
+
+  bool check_hash_summary = false;
+  if (arguments.count(PARAM_NAME_CHECK_ON) == 1 ) {
+    config->check_hash = new bool(true);
+  }
+  else if (arguments.count(PARAM_NAME_CHECK_ON) > 1) {
+    logger->write_message("*** Argument [" + PARAM_NAME_CHECK_ON + "] specified more than once.", error);
+  }
+  else {
+    config->check_hash = false;
   }
 
   return config;
@@ -119,15 +164,19 @@ int main(int argc, char *argv[]) {
   map<string, string> arguments; //key value a pair of arguments
   parse_arguments_to_map(argc, argv, arguments); //parse command line argument to map
 
-  copy_config* config;
+  copy_config* config = nullptr;
+  logger* logger = nullptr;
 
   try {
-    config = get_config_from_arguments(arguments); //get config
+    config = get_config_from_arguments(arguments, logger); //get config
   }
   catch (exception const error) {
     cout << error.what() << '\n';
     return EXIT_FAILURE;
   }
+
+  copy_mod cpmod(config);
+  cpmod.start_copy();
 
   return EXIT_SUCCESS;
 }

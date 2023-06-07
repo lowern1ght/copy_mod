@@ -10,12 +10,21 @@
 using namespace std;
 using namespace filesystem;
 
+enum logger_type {
+  error, info, warning
+};
+
 class logger {
 private:
   path* path_to_logger_file;
   bool write_to_console = true;
 public:
   logger(path* path_to_logger_file, bool write_to_console);
+  ~logger();
+public:
+  void write_message(string message, logger_type type);
 };
+
+string get_enum_name(const logger_type type);
 
 #endif //COPY_MOD_SRC_MODULES_LOGGER_H

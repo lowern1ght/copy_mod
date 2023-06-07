@@ -13,6 +13,7 @@ using namespace filesystem;
 
 class copy_config {
 public:
+  bool* check_hash;
   path* to_copy;
   path* from_entity_copy;
   logger* logger;
