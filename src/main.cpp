@@ -15,7 +15,7 @@
 #include <iostream>
 #include <algorithm>
 #include <filesystem>
-#include "headers/copy_config.h"
+#include <copy_config.h>
 
 #define STRING_EMPTY ""
 
@@ -125,7 +125,7 @@ copy_config* get_config_from_arguments(map<string, string> &arguments) {
 }
 
 int main(int argc, char *argv[]) {
-  map<string, string> arguments; //key value pair of arguments
+  map<string, string> arguments; //key value a pair of arguments
   parse_arguments_to_map(argc, argv, arguments); //parse command line argument to map
 
   copy_config* config;
