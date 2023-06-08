@@ -49,6 +49,7 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
   if (first == PARAM_NAME_COPY_TO    ||
       first == PARAM_NAME_COPY_FROM  ||
       first == PARAM_NAME_CHECK_ON   ||
+      first == PARAM_NAME_ROTATION   ||
       first == PARAM_NAME_LOG)
   {
     return new pair<string, string>(first, second != DSTRING_EMPTY ? clear_string(second) : second);
@@ -68,6 +69,19 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
   }
 }
 
+int get_int_from_argument(string arg) {
+  if (arg == STRING_EMPTY) {
+    return 0;
+  }
+
+  string digits = STRING_EMPTY;
+  for (auto ch : arg) {
+    if (isdigit(ch)) { digits += ch; }
+  }
+
+  return stoi(digits);
+}
+
 copy_config *get_config_from_arguments(map<string, string> &arguments, logger* logger) {
   copy_config* config = new copy_config;
 
@@ -77,35 +91,19 @@ copy_config *get_config_from_arguments(map<string, string> &arguments, logger* l
 
   if (arguments.count(PARAM_NAME_LOG) == 1) {
     auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
+    path_to_log_file = new path(current_path() / value_pair);
 
-    auto default_path = new path(current_path() / "log.txt");
-
-    /*if (value_pair == DSTRING_EMPTY) {
-      path_to_log_file = default_path;
+    int rotation_max_size = 4;
+    if (arguments.count(PARAM_NAME_ROTATION) == 1) {
+      rotation_max_size = get_int_from_argument(arguments.find(PARAM_NAME_ROTATION)->second);
     }
-    else {
-      auto temp_path = new path(value_pair);
-      if (exists(temp_path->remove_filename()) && is_directory(temp_path->remove_filename())) {
-        path_to_log_file = temp_path;
-      }
-      else if (temp_path->is_relative()) {
-        path_to_log_file = new path(current_path() / temp_path->filename());
-      }
-      else {
-        path_to_log_file = default_path;
-      }
-    }*/
 
-    path_to_log_file = new path(current_path() / "log.txt");
-
-    logger = new class logger(path_to_log_file, true);
+    logger = new class logger(path_to_log_file, true, rotation_max_size);
     config->logger = logger;
   }
   else if(arguments.count(PARAM_NAME_LOG) > 1) {
     logger->write_message("*** Argument [\" + PARAM_NAME_LOG + \"] specified more than once.", error);
   }
-
-  logger->write_message(" --- LOGGER ACTIVE --- ", info);
 
   // ===============================================================================================
 

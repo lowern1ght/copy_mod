@@ -16,8 +16,9 @@ using namespace std;
 using namespace chrono;
 using namespace filesystem;
 
-logger::logger(path *path_to_logger_file, bool write_to_console = true) {
+logger::logger(path *path_to_logger_file, bool write_to_console = true, int rotation_size) {
   this->write_to_console = write_to_console;
+  this->rotation_size = rotation_size;
 
   if (path_to_logger_file != nullptr)
   {

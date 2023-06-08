@@ -18,8 +18,9 @@ class logger {
 private:
   path* path_to_logger_file;
   bool write_to_console = true;
+  int rotation_size;
 public:
-  logger(path* path_to_logger_file, bool write_to_console);
+  logger(path* path_to_logger_file, bool write_to_console, int rotation_size = 4);
   ~logger();
 public:
   void write_message(string message, logger_type type);
