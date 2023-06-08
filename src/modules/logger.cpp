@@ -2,15 +2,16 @@
 // Created by lowern1ght on 07.06.2023.
 //
 
-#include <ios>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <string>
-#include <fstream>
-#include <iostream>
+#include <sstream>
 #include <logger.h>
 #include <copy_mod.h>
-#include <sstream>
 
 using namespace std;
 using namespace chrono;
@@ -40,6 +41,12 @@ string get_enum_name(const logger_type type) {
   }
 
   return "";
+}
+
+void logger::check_log_file_size_and_clean() {
+  if (file_size(*path_to_logger_file) >= rotation_size) {
+
+  }
 }
 
 void logger::write_message(string message, logger_type type) {

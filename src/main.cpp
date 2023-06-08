@@ -7,13 +7,12 @@
 
 #include <map>
 #include <string>
-#include <vector>
 #include <iostream>
 #include <algorithm>
+#include <copy_mod.h>
 #include <filesystem>
 #include <copy_config.h>
 #include <define_param.h>
-#include "copy_mod.h"
 
 const char SYMBOL_SEPARATE = '=';
 
@@ -69,19 +68,74 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
   }
 }
 
-int get_int_from_argument(string arg) {
+string to_upper(const string str) {
+  string str_t = "";
+  for (int i = 0; i < str.length(); ++i) {
+    str_t += toupper(str[i]);
+  }
+  return str_t;
+}
+
+/// \param arg
+/// \return
+long long get_int_from_argument(string arg) {
   if (arg == STRING_EMPTY) {
     return 0;
   }
 
+  size_t type_dt = 1;
+
+  auto upper_str = to_upper(arg); //String to upper
+
+  auto find_gb = upper_str.find(ROTATION_GB);
+  if (find_gb != std::string::npos) {
+    upper_str.replace(upper_str.find(ROTATION_GB), sizeof(ROTATION_GB) - 1, DSTRING_EMPTY);
+  }
+
+  auto find_mb = upper_str.find(ROTATION_MB);
+  if (find_mb != std::string::npos) {
+    upper_str.replace(upper_str.find(ROTATION_MB), sizeof(ROTATION_MB) - 1, DSTRING_EMPTY);
+    type_dt = 2;
+  }
+
+  auto find_kb = upper_str.find(ROTATION_KB);
+  if (find_kb != std::string::npos) {
+    upper_str.replace(upper_str.find(ROTATION_KB), sizeof(ROTATION_KB) - 1, DSTRING_EMPTY);
+    type_dt = 3;
+  }
+
   string digits = STRING_EMPTY;
-  for (auto ch : arg) {
+  for (auto ch : upper_str) {
     if (isdigit(ch)) { digits += ch; }
   }
 
-  return stoi(digits);
+  long long arg_int = (long long)stoi(digits);
+
+  long long gb_convert = 1073741824;
+  long long mb_convert = 1048576;
+  long long kb_convert = 1024;
+
+  long long result = 0;
+  switch (type_dt)
+  {
+  case 1:
+    result = arg_int * gb_convert;
+    break;
+  case 2:
+    result = arg_int * mb_convert;
+    break;
+  case 3:
+    result = arg_int * kb_convert;
+    break;
+  }
+  
+  return result;
 }
 
+/// Parse arguments list to copy_config class
+/// \param arguments
+/// \param logger
+/// \return copy_config
 copy_config *get_config_from_arguments(map<string, string> &arguments, logger* logger) {
   copy_config* config = new copy_config;
 
@@ -93,7 +147,7 @@ copy_config *get_config_from_arguments(map<string, string> &arguments, logger* l
     auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
     path_to_log_file = new path(current_path() / value_pair);
 
-    int rotation_max_size = 4;
+    long long rotation_max_size = 2097152; //default 2MB
     if (arguments.count(PARAM_NAME_ROTATION) == 1) {
       rotation_max_size = get_int_from_argument(arguments.find(PARAM_NAME_ROTATION)->second);
     }
