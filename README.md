@@ -28,5 +28,7 @@ Arguments for start use program:
   name in the current program startup folder
 - ? **--lg (**logger_on**)** - don't specify a path that logger file create in the current work folder
 - ? **--chck** **(check_on)** - hash check parameter after copying is completed
+- ? **--rt=2gb** **(rotation_file)** - option set max size log file, clearing if file larger this value (examples): --rt=2bg, --rt=1mb --rt=201kb.
+  additions (GB, MB, KB) 
 
 ---
