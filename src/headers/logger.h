@@ -16,18 +16,23 @@ enum logger_type {
 
 class logger {
 private:
-  path* path_to_logger_file;
+  path *path_to_logger_file;
   bool write_to_console = true;
   long long rotation_size;
 private:
   void check_log_file_size_and_clean();
+
 public:
-  logger(path* path_to_logger_file, bool write_to_console, int rotation_size = 4);
+  logger(path *path_to_logger_file, bool write_to_console, int rotation_size);
+
   ~logger();
+
 public:
-  void write_message(string message, logger_type type);
+  void
+  write_message(string message, logger_type type);
 };
 
-string get_enum_name(const logger_type type);
+string
+get_enum_name(const logger_type type);
 
 #endif //COPY_MOD_SRC_MODULES_LOGGER_H

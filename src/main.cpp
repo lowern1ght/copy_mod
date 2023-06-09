@@ -19,24 +19,28 @@ const char SYMBOL_SEPARATE = '=';
 using namespace std;
 using namespace filesystem;
 
-string clear_string(const string &str, char symbol_remove = '"') {
+string
+clear_string(const string &str, char symbol_remove = '"') {
   string result;
 
   for (auto const c : str) {
-    if (c != symbol_remove) { result += c; }
+    if (c != symbol_remove) {
+      result += c;
+    }
   }
 
   return result;
 }
 
-pair<string, string>* get_pair_from_string(const string arg) noexcept {
+pair<string, string> *
+get_pair_from_string(const string arg) noexcept {
   string first = DSTRING_EMPTY, second = DSTRING_EMPTY;
 
   for (int i = 0; i < arg.length(); ++i) {
     if (arg[i] == SYMBOL_SEPARATE) {
       first = arg.substr(0, i);
       if (i + 1 < arg.length()) {
-        second = arg.substr(i+1, arg.length());
+        second = arg.substr(i + 1, arg.length());
       }
     }
   }
@@ -45,20 +49,19 @@ pair<string, string>* get_pair_from_string(const string arg) noexcept {
     first = arg;
   }
 
-  if (first == PARAM_NAME_COPY_TO    ||
-      first == PARAM_NAME_COPY_FROM  ||
-      first == PARAM_NAME_CHECK_ON   ||
-      first == PARAM_NAME_ROTATION   ||
-      first == PARAM_NAME_LOG)
-  {
+  if (first == PARAM_NAME_COPY_TO ||
+      first == PARAM_NAME_COPY_FROM ||
+      first == PARAM_NAME_CHECK_ON ||
+      first == PARAM_NAME_ROTATION ||
+      first == PARAM_NAME_LOG) {
     return new pair<string, string>(first, second != DSTRING_EMPTY ? clear_string(second) : second);
-  }
-  else {
+  } else {
     return nullptr;
   }
 }
 
-void parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments) noexcept {
+void
+parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments) noexcept {
   for (int i = 0; i < argc; ++i) {
     auto pair = get_pair_from_string(argv[i]);
 
@@ -68,7 +71,8 @@ void parse_arguments_to_map(int argc, char *argv[], map<string, string> &argumen
   }
 }
 
-string to_upper(const string str) {
+string
+to_upper(const string str) {
   string str_t = "";
   for (int i = 0; i < str.length(); ++i) {
     str_t += toupper(str[i]);
@@ -78,7 +82,8 @@ string to_upper(const string str) {
 
 /// \param arg
 /// \return
-long long get_int_from_argument(string arg) {
+long long
+get_int_from_argument(string arg) {
   if (arg == STRING_EMPTY) {
     return 0;
   }
@@ -106,29 +111,27 @@ long long get_int_from_argument(string arg) {
 
   string digits = STRING_EMPTY;
   for (auto ch : upper_str) {
-    if (isdigit(ch)) { digits += ch; }
+    if (isdigit(ch)) {
+      digits += ch;
+    }
   }
 
-  long long arg_int = (long long)stoi(digits);
+  long long arg_int = (long long) stoi(digits);
 
   long long gb_convert = 1073741824;
   long long mb_convert = 1048576;
   long long kb_convert = 1024;
 
   long long result = 0;
-  switch (type_dt)
-  {
-  case 1:
-    result = arg_int * gb_convert;
+  switch (type_dt) {
+  case 1:result = arg_int * gb_convert;
     break;
-  case 2:
-    result = arg_int * mb_convert;
+  case 2:result = arg_int * mb_convert;
     break;
-  case 3:
-    result = arg_int * kb_convert;
+  case 3:result = arg_int * kb_convert;
     break;
   }
-  
+
   return result;
 }
 
@@ -136,12 +139,13 @@ long long get_int_from_argument(string arg) {
 /// \param arguments
 /// \param logger
 /// \return copy_config
-copy_config *get_config_from_arguments(map<string, string> &arguments, logger* logger) {
-  copy_config* config = new copy_config;
+copy_config *
+get_config_from_arguments(map<string, string> &arguments, logger *logger) {
+  copy_config *config = new copy_config;
 
   // ===============================================================================================
 
-  path* path_to_log_file = nullptr;
+  path *path_to_log_file = nullptr;
 
   if (arguments.count(PARAM_NAME_LOG) == 1) {
     auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
@@ -154,27 +158,26 @@ copy_config *get_config_from_arguments(map<string, string> &arguments, logger* l
 
     logger = new class logger(path_to_log_file, true, rotation_max_size);
     config->logger = logger;
-  }
-  else if(arguments.count(PARAM_NAME_LOG) > 1) {
+  } else if (arguments.count(PARAM_NAME_LOG) > 1) {
     logger->write_message("*** Argument [\" + PARAM_NAME_LOG + \"] specified more than once.", error);
   }
 
   // ===============================================================================================
 
-  path* path_from_copy = nullptr;
+  path *path_from_copy = nullptr;
 
   if (arguments.count(PARAM_NAME_COPY_FROM) == 1) {
     try {
       path_from_copy = new path(arguments.find(PARAM_NAME_COPY_FROM)->second);
-    } catch(exception const &exception) {
+    }
+    catch (exception const &exception) {
       logger->write_message(" *** Wrong path to _entity_ *** ", logger_type::error);
     }
 
     if (!filesystem::exists(*path_from_copy)) {
       logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
     }
-  }
-  else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
+  } else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
     logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
   }
 
@@ -184,18 +187,17 @@ copy_config *get_config_from_arguments(map<string, string> &arguments, logger* l
 
   // ===============================================================================================
 
-  path* path_to_copy = nullptr;
+  path *path_to_copy = nullptr;
 
   if (arguments.count(PARAM_NAME_COPY_TO) == 1) {
     path_to_copy = new path(arguments.find(PARAM_NAME_COPY_TO)->second);
     if (filesystem::exists(*path_to_copy)) {
       config->to_copy = path_to_copy;
     }
-    //Todo: реализовать копирование в несколько папок (directories)
+      //Todo: реализовать копирование в несколько папок (directories)
     else if (arguments.count(PARAM_NAME_COPY_TO) > 1) {
       logger->write_message(" *** Argument [" + PARAM_NAME_COPY_TO + "] specified more than once. *** ", error);
-    }
-    else {
+    } else {
       logger->write_message("*** End point to copy is bad path ***", error);
     }
   }
@@ -203,25 +205,24 @@ copy_config *get_config_from_arguments(map<string, string> &arguments, logger* l
   // ===============================================================================================
 
   bool check_hash_summary = false;
-  if (arguments.count(PARAM_NAME_CHECK_ON) == 1 ) {
+  if (arguments.count(PARAM_NAME_CHECK_ON) == 1) {
     config->check_hash = new bool(true);
-  }
-  else if (arguments.count(PARAM_NAME_CHECK_ON) > 1) {
+  } else if (arguments.count(PARAM_NAME_CHECK_ON) > 1) {
     logger->write_message("*** Argument [" + PARAM_NAME_CHECK_ON + "] specified more than once.", error);
-  }
-  else {
+  } else {
     config->check_hash = false;
   }
 
   return config;
 }
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[]) {
   map<string, string> arguments; //key value a pair of arguments
   parse_arguments_to_map(argc, argv, arguments); //parse command line argument to map
 
-  copy_config* config = nullptr;
-  logger* logger = nullptr;
+  copy_config *config = nullptr;
+  logger *logger = nullptr;
 
   try {
     config = get_config_from_arguments(arguments, logger); //get config

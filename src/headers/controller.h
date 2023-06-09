@@ -16,8 +16,11 @@ using namespace filesystem;
 
 class controller {
 public:
-  string static get_hash_summary(const path &entity);
-  string static get_byte_entity(const path &entity);
+  string static
+  get_hash_summary(const path &entity);
+
+  string static
+  get_byte_entity(const path &entity);
 };
 
 #endif //COPY_MOD_SRC_MODULES_CONTROLLER_H
