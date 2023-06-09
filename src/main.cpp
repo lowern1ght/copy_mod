@@ -141,15 +141,20 @@ get_int_from_argument(string arg) {
 /// \return copy_config
 copy_config *
 get_config_from_arguments(map<string, string> &arguments, logger *logger) {
-  copy_config *config = new copy_config;
+  auto *config = new copy_config;
 
   // ===============================================================================================
 
   path *path_to_log_file = nullptr;
 
   if (arguments.count(PARAM_NAME_LOG) == 1) {
-    auto value_pair = arguments.find(PARAM_NAME_LOG)->second;
-    path_to_log_file = new path(current_path() / value_pair);
+    auto lg_file_value = arguments.find(PARAM_NAME_LOG)->second;
+
+    if (lg_file_value.empty()) {
+      lg_file_value = "log.txt";
+    }
+
+    path_to_log_file = new path(current_path() / lg_file_value);
 
     long long rotation_max_size = 2097152; //default 2MB
     if (arguments.count(PARAM_NAME_ROTATION) == 1) {

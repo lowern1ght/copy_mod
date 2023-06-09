@@ -5,6 +5,7 @@
 #include <string>
 #include <conio.h>
 #include <thread>
+#include <colors.h>
 #include <copy_mod.h>
 #include <filesystem>
 
@@ -62,21 +63,68 @@ get_directory_name(path *pth) {
 }
 
 void
+copy_mod::loading_animation(const bool& working, exception_ptr* exc_p, logger& logger) {
+  cout << '\n' << " --- Copy  ";
+
+  while (working) {
+    this_thread::sleep_for(0.8s);
+    cout << "\b\\" << flush;
+    this_thread::sleep_for(0.8s);
+    cout << "\b|" << flush;
+    this_thread::sleep_for(0.8s);
+    cout << "\b/" << flush;
+    this_thread::sleep_for(0.8s);
+    cout << "\b-" << flush;
+  }
+
+  try {
+    if (exc_p != nullptr)
+      rethrow_exception(*exc_p);
+    logger.write_message("copy is COMPLETE", info, false);
+    cout << "\b " << FGRN("COMPLETE") << " ---" << "\n";
+  }
+  catch (exception &exception) {
+    logger.write_message("copy is FAILED with _message_ " + to_string(*exception.what()), info, false);
+    cout << "\b " << FRED("ERROR") << ", " << exception.what() << " ---" << "\n";
+  }
+}
+
+void
+complete_copy(bool &working, path &path_from, path& path_to, exception_ptr* exception_ptr) {
+  working = true;
+
+  try {
+    filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive );
+  } catch (...) {
+    *exception_ptr = current_exception();
+  }
+
+  working = false;
+}
+
+void
 copy_mod::start_copy() {
   if (is_directory(*config->to_copy)) {
     auto name_dir = get_directory_name(config->from_entity_copy);
     config->to_copy = new path(*config->to_copy / name_dir);
   }
 
-  auto sum_ents = get_count_elements(config->from_entity_copy);
-
   auto that_copy = is_directory(*config->from_entity_copy)
       ? "folder " + get_directory_name(config->from_entity_copy)
       : "file " + config->from_entity_copy->filename().string();
 
-  this->config->logger->write_message("--- Begin copy (" + that_copy + ")", info);
+  this->config->logger->write_message(" --- Begin copy (" + that_copy + ") to " + config->to_copy->string(), info);
 
-  copy(*config->from_entity_copy, *config->to_copy, copy_options::overwrite_existing | copy_options::recursive);
+  auto working = true;
+  exception_ptr* exc_ptr = nullptr;
+
+  vector<thread> threads;
+
+  threads.emplace_back(thread(complete_copy, std::ref(working), ref(*config->from_entity_copy), ref(*config->to_copy), exc_ptr));
+  threads.emplace_back(thread(loading_animation, ref(working), exc_ptr, ref(*config->logger)));
+
+  for (auto& th : threads)
+    th.join();
 
   if (config->check_hash) {
     check_values_hash(config->from_entity_copy, config->to_copy);

@@ -24,15 +24,12 @@ private:
 
 public:
   logger(path *path_to_logger_file, bool write_to_console, int rotation_size);
-
-  ~logger();
-
 public:
   void
-  write_message(string message, logger_type type);
+  write_message(string message, logger_type type, bool pwrite_to_console = true);
 };
 
 string
-get_enum_name(const logger_type type);
+get_enum_name(logger_type type);
 
 #endif //COPY_MOD_SRC_MODULES_LOGGER_H

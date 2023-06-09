@@ -41,7 +41,7 @@ get_enum_name(const logger_type type) {
 }
 
 void logger::check_log_file_size_and_clean() {
-  if (file_size(*path_to_logger_file) >= rotation_size) {
+  if (exists(*path_to_logger_file) && file_size(*path_to_logger_file) >= rotation_size) {
     std::ofstream ofs;
     ofs.open(*path_to_logger_file, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
@@ -49,7 +49,7 @@ void logger::check_log_file_size_and_clean() {
 }
 
 void
-logger::write_message(string message, logger_type type) {
+logger::write_message(string message, logger_type type, bool pwrite_to_console) {
   auto t = std::time(nullptr);
   auto tm = *std::localtime(&t);
 
@@ -62,11 +62,12 @@ logger::write_message(string message, logger_type type) {
     throw copy_exception(message);
   }
 
-  if (write_to_console) {
-    cout << log_message << '\n';
+  if (write_to_console && pwrite_to_console) {
+    //write only message without time and log type
+    cout << message << '\n';
   }
 
-  if (filesystem::exists(*path_to_logger_file)) {
+  if (path_to_logger_file != nullptr) {
     check_log_file_size_and_clean();
 
     ofstream out_file(*path_to_logger_file, ios::app);
