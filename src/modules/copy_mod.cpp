@@ -63,7 +63,7 @@ get_directory_name(path *pth) {
 }
 
 void
-copy_mod::loading_animation(const bool& working, exception_ptr* exc_p, logger& logger) {
+copy_mod::loading_animation(const bool &working, exception_ptr *exc_p, logger &logger) {
   cout << '\n' << " --- Copy  ";
 
   while (working) {
@@ -90,12 +90,13 @@ copy_mod::loading_animation(const bool& working, exception_ptr* exc_p, logger& l
 }
 
 void
-complete_copy(bool &working, path &path_from, path& path_to, exception_ptr* exception_ptr) {
+complete_copy(bool &working, path &path_from, path &path_to, exception_ptr *exception_ptr) {
   working = true;
 
   try {
-    filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive );
-  } catch (...) {
+    filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive);
+  }
+  catch (...) {
     *exception_ptr = current_exception();
   }
 
@@ -110,20 +111,24 @@ copy_mod::start_copy() {
   }
 
   auto that_copy = is_directory(*config->from_entity_copy)
-      ? "folder " + get_directory_name(config->from_entity_copy)
-      : "file " + config->from_entity_copy->filename().string();
+                   ? "folder " + get_directory_name(config->from_entity_copy)
+                   : "file " + config->from_entity_copy->filename().string();
 
   this->config->logger->write_message(" --- Begin copy (" + that_copy + ") to " + config->to_copy->string(), info);
 
   auto working = true;
-  exception_ptr* exc_ptr = nullptr;
+  exception_ptr *exc_ptr = nullptr;
 
   vector<thread> threads;
 
-  threads.emplace_back(thread(complete_copy, std::ref(working), ref(*config->from_entity_copy), ref(*config->to_copy), exc_ptr));
+  threads.emplace_back(thread(complete_copy,
+                              std::ref(working),
+                              ref(*config->from_entity_copy),
+                              ref(*config->to_copy),
+                              exc_ptr));
   threads.emplace_back(thread(loading_animation, ref(working), exc_ptr, ref(*config->logger)));
 
-  for (auto& th : threads)
+  for (auto &th : threads)
     th.join();
 
   if (config->check_hash) {

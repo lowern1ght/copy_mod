@@ -20,7 +20,8 @@ private:
   bool write_to_console = true;
   long long rotation_size;
 private:
-  void check_log_file_size_and_clean();
+  void
+  check_log_file_size_and_clean();
 
 public:
   logger(path *path_to_logger_file, bool write_to_console, int rotation_size);

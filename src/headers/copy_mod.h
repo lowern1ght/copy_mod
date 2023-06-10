@@ -16,7 +16,7 @@ private:
   copy_config *config;
 
   static void
-  loading_animation(const bool& working, exception_ptr* exc_p, logger &logger);
+  loading_animation(const bool &working, exception_ptr *exc_p, logger &logger);
 private:
   void
   check_values_hash(path *pth_to, path *pth_from);

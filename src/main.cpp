@@ -33,13 +33,20 @@ clear_string(const string &str, char symbol_remove = '"') {
 }
 
 pair<string, string> *
-get_pair_from_string(const string arg) noexcept {
+get_pair_from_string(const string arg)
+noexcept {
   string first = DSTRING_EMPTY, second = DSTRING_EMPTY;
 
-  for (int i = 0; i < arg.length(); ++i) {
+  for (
+      int i = 0;
+      i < arg.
+          length();
+      ++i) {
     if (arg[i] == SYMBOL_SEPARATE) {
       first = arg.substr(0, i);
-      if (i + 1 < arg.length()) {
+      if (i + 1 < arg.
+          length()
+          ) {
         second = arg.substr(i + 1, arg.length());
       }
     }
@@ -54,19 +61,29 @@ get_pair_from_string(const string arg) noexcept {
       first == PARAM_NAME_CHECK_ON ||
       first == PARAM_NAME_ROTATION ||
       first == PARAM_NAME_LOG) {
-    return new pair<string, string>(first, second != DSTRING_EMPTY ? clear_string(second) : second);
+    return new
+        pair<string, string>(first, second
+                                        != DSTRING_EMPTY ?
+                                    clear_string(second)
+                                                         : second);
   } else {
-    return nullptr;
+    return
+        nullptr;
   }
 }
 
 void
-parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments) noexcept {
-  for (int i = 0; i < argc; ++i) {
+parse_arguments_to_map(int argc, char *argv[], map<string, string> &arguments)
+noexcept {
+  for (
+      int i = 0;
+      i < argc;
+      ++i) {
     auto pair = get_pair_from_string(argv[i]);
 
     if (pair != nullptr) {
-      arguments.insert(*pair);
+      arguments.
+          insert(*pair);
     }
   }
 }

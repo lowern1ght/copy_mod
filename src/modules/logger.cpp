@@ -12,6 +12,7 @@
 #include <sstream>
 #include <logger.h>
 #include <copy_mod.h>
+#include <define_param.h>
 
 using namespace std;
 using namespace chrono;
@@ -37,10 +38,11 @@ get_enum_name(const logger_type type) {
     break;
   }
 
-  return "";
+  return DSTRING_EMPTY;
 }
 
-void logger::check_log_file_size_and_clean() {
+void
+logger::check_log_file_size_and_clean() {
   if (exists(*path_to_logger_file) && file_size(*path_to_logger_file) >= rotation_size) {
     std::ofstream ofs;
     ofs.open(*path_to_logger_file, std::ofstream::out | std::ofstream::trunc);
