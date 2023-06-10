@@ -4,6 +4,15 @@
 - **Author :** ```lowern1ght``` 🥸
 - **License :** ```MIT```
 
+## Getting started
+
+<p align="center">
+install release <strong>binary file</strong> 
+<a href="https://github.com/lowern1ght/copy_mod/releases/tag/binary">release</a> or
+git clone and build rep.
+<code lang="bash">conan install .</code> and cmake build . in <strong>src</strong> directory
+</p>
+
 ## Description
 
 ---
@@ -28,7 +37,8 @@ Arguments for start use program:
   name in the current program startup folder
 - ? **--lg (**logger_on**)** - don't specify a path that logger file create in the current work folder
 - ? **--chck** **(check_on)** - hash check parameter after copying is completed
-- ? **--rt=2gb** **(rotation_file)** - option set max size log file, clearing if file larger this value (examples): --rt=2bg, --rt=1mb --rt=201kb.
-  additions (GB, MB, KB) 
+- ? **--rt=2gb** **(rotation_file)** - option set max size log file, clearing if file larger this value (examples):
+  --rt=2bg, --rt=1mb --rt=201kb.
+  additions (GB, MB, KB)
 
 ---
