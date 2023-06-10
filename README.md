@@ -6,12 +6,20 @@
 
 ## Getting started
 
-<p align="center">
+<p>
 install release <strong>binary file</strong> 
-<a href="https://github.com/lowern1ght/copy_mod/releases/tag/binary">release</a> or
-git clone and build rep.
-<code lang="bash">conan install .</code> and cmake build . in <strong>src</strong> directory
+<a href="https://github.com/lowern1ght/copy_mod/releases/tag/binary">release</a> or git clone and build rep.
 </p>
+
+### Require for build
+
+- **CMake**
+- **conan** (package manager)
+
+<p>
+<code lang="bash">conan install .</code> and <code>cmake build .</code> in <strong>src</strong> directory
+</p>
+
 
 ## Description
 
