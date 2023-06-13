@@ -11,6 +11,7 @@
 
 using std::string;
 using namespace std::filesystem;
+using namespace std::chrono_literals;
 
 copy_exception::copy_exception(std::string &msg) throw()
     : exception(msg.c_str()) {
@@ -68,63 +69,50 @@ void copy_mod::loading_animation(const bool &working,
                                  logger &logger,
                                  path &path_to,
                                  path &path_from) {
-
-
   if (is_directory(path_from)) {
-    int count_full = 0;
+    unsigned long long full_size = 0;
     for (auto ent : std::filesystem::recursive_directory_iterator(path_from)) {
-      count_full += 1;
+      full_size += ent.file_size();
     }
+
+    unsigned long long on_percent = full_size * 0.01;
 
     progressbar pgrbar(100);
     pgrbar.set_todo_char("_");
     pgrbar.set_done_char("#");
     pgrbar.show_bar();
 
+    size_t iter = 0;
+    unsigned long long last_files_size = 0;
     while(true) {
-      int last_percent, cur_percent;
-      int on_percent = count_full / 100;
-
-      std::vector<string> ready_copy;
-      for (const auto& entity_to : std::filesystem::recursive_directory_iterator(path_to)) {
-        if (std::find(ready_copy.begin(), ready_copy.end(), entity_to.path().string()) == ready_copy.end()) {
-          auto path_str = entity_to.path().string();
-          ready_copy.push_back(path_str);
-        }
-
-        cur_percent = (int)ready_copy.capacity() / count_full;
-        if(last_percent <= cur_percent && cur_percent <= 1) {
-          last_percent = count_full;
-          pgrbar.update();
-        }
-      }
-
-      if (ready_copy.capacity() == count_full) {
+      if (last_files_size == full_size) {
         break;
       }
+
+      unsigned long long current_files_size = 0;
+      for (const auto& entity_to : std::filesystem::recursive_directory_iterator(path_to)) {
+        current_files_size += entity_to.file_size();
+      }
+
+      if (iter < 100 && current_files_size - last_files_size > on_percent) {
+        pgrbar.update();
+      }
+
+      last_files_size = current_files_size;
     }
+
+    pgrbar.show_bar(false);
   }
   else {
-    progressbar pgrbar(1);
+    progressbar pgrbar(100);
     pgrbar.set_todo_char("_");
     pgrbar.set_done_char("#");
 
-    auto path_result = path_to / path_from.filename();
+    unsigned long long size_to = file_size(path_to);
     while (true) {
-      if(exists(path_result)) {
-        pgrbar.update();
-        break;
-      }
+      //Todo: прогресс по файлу
+      break;
     }
-  }
-
-
-
-  while (working) {
-
-
-
-
   }
 }
 

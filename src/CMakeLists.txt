@@ -11,7 +11,7 @@ file(GLOB SOURCES
 
 include_directories(modules headers includes)
 
-add_executable(copy_mod ${SOURCES} includes/color.hpp)
+add_executable(copy_mod ${SOURCES})
 
 find_package(OpenSSL REQUIRED)
 if (OpenSSL_FOUND)

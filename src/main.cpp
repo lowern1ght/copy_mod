@@ -254,25 +254,12 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
     if (std::filesystem::exists(*path_to_copy)) {
       config->to_copy = path_to_copy;
     }
-      //Todo: реализовать копирование в несколько папок (directories)
     else if (arguments.count(PARAM_NAME_COPY_TO) > 1) {
       logger->write_message("argument [" + PARAM_NAME_COPY_TO + "] specified more than once.", error);
     } else {
       std::filesystem::create_directories(*path_to_copy);
       logger->write_message("end point \"" + path_to_copy->string() +"\" to copy not exists, directory be create", warning);
-
-      using namespace std;
-
-      auto ate = 1;
-      while(true) {
-        std::this_thread::sleep_for(0.2s);
-
-        if(ate >= 2 || exists(*path_to_copy)) {
-          break;
-        }
-
-        ate += 1;
-      }
+      config->to_copy = path_to_copy;
     }
   }
 
