@@ -25,8 +25,8 @@ private:
 public:
   logger(path *path_to_logger_file, bool write_to_console, long long rotation_size);
 public:
-  void
-  write_message(std::string message, logger_type type, bool pwrite_to_console = true);
+  static void log_to_console(std::string BasicString, logger_type Type);
+  void write_message(std::string message, logger_type type, bool pwrite_to_console = true);
 };
 
 std::string

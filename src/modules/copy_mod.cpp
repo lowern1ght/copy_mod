@@ -6,7 +6,6 @@
 #include <thread>
 #include <iostream>
 #include <copy_mod.h>
-#include "colors/color.hpp"
 #include <filesystem>
 
 using std::string;
@@ -72,11 +71,11 @@ copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p, logg
     if (exc_p != nullptr)
       rethrow_exception(*exc_p);
     logger.write_message("copy complete without exceptions", info, false);
-    cout << dye::green("\bcomplete") << "\n";
+    logger::log_to_console("\bcomplete", info);
   }
   catch (exception &exception) {
     logger.write_message("copy failed with message " + to_string(*exception.what()), info, false);
-    std::cout << dye::red("\bfailed with exception") << ": " << exception.what() << "\n";
+    logger::log_to_console("\bfailed with exception" + string(exception.what()), info);
   }
 }
 

@@ -1,12 +1,5 @@
 #pragma pack copy_mod
 
-/*
- * application: copy_mod
- *
- * by lowern1ght
- *
- * */
-
 #include <map>
 #include <string>
 #include <iostream>

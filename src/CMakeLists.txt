@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB SOURCES
         ../src/*.cpp
         ../src/headers/*.h
+        ../src/includes/*
         ../src/includes/colors/*
         ../src/modules/*.cpp)
 

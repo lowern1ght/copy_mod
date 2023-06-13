@@ -10,6 +10,7 @@
 #include <logger.h>
 #include <copy_mod.h>
 #include <define_param.h>
+#include <colors/color.hpp>
 
 using namespace std::chrono;
 using namespace std::filesystem;
@@ -57,19 +58,7 @@ logger::write_message(string message, logger_type type, bool pwrite_to_console) 
   string log_message = oss.str();
 
   if (write_to_console && pwrite_to_console) {
-    //write only message without time and log type
-
-    if (type == error) {
-      std::cout << dye::red(message) << "\n";
-    }
-
-    if (type == warning) {
-      std::cout << dye::yellow(message) << "\n";
-    }
-
-    if (type == info) {
-      std::cout << message << '\n';
-    }
+    log_to_console(message, type);
   }
 
   if (path_to_logger_file != nullptr) {
@@ -82,5 +71,22 @@ logger::write_message(string message, logger_type type, bool pwrite_to_console) 
 
   if (type == error) {
     throw copy_exception(message);
+  }
+}
+void logger::log_to_console(std::string BasicString, logger_type Type) {
+
+}
+
+void log_to_console(const std::string &str, logger_type type) {
+  if (type == error) {
+    std::cout << dye::red(str) << "\n";
+  }
+
+  if (type == warning) {
+    std::cout << dye::yellow(str) << "\n";
+  }
+
+  if (type == info) {
+    std::cout << str << '\n';
   }
 }
