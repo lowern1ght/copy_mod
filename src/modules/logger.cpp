@@ -10,6 +10,7 @@
 #include <logger.h>
 #include <copy_mod.h>
 #include <define_param.h>
+
 #include <colors/color.hpp>
 
 using namespace std::chrono;
@@ -74,16 +75,27 @@ logger::write_message(string message, logger_type type, bool pwrite_to_console) 
   }
 }
 
+void split_by_char(std::string const &str, const char* delim, std::vector<std::string> &out)
+{
+  char *token = strtok(const_cast<char*>(str.c_str()), delim);
+  while (token != nullptr)
+  {
+    out.push_back(std::string(token));
+    token = strtok(nullptr, delim);
+  }
+}
+
 void logger::log_to_console(const std::string &str, logger_type type) {
   if (type == error) {
-    std::cout << dye::red(str) << "\n";
+    std::cout << dye::colorize(str, "red") << "\n";
   }
 
   if (type == warning) {
-    std::cout << dye::yellow(str) << "\n";
+    std::cout << dye::colorize(str, "yellow") << "\n";
   }
 
   if (type == info) {
+
     std::cout << str << '\n';
   }
 }

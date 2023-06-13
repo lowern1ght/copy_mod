@@ -104,7 +104,7 @@ copy_mod::start_copy() {
                    ? "folder " + get_directory_name(config->from_entity_copy)
                    : "file " + config->from_entity_copy->filename().string();
 
-  this->config->logger->write_message("begin copy (" + that_copy + ") to " + config->to_copy->string(), info);
+  this->config->logger->write_message("begin copy \"" + that_copy + "\" to " + config->to_copy->string(), info);
 
   auto working = true;
   std::exception_ptr *exc_ptr = nullptr;
@@ -116,6 +116,7 @@ copy_mod::start_copy() {
                               std::ref(*config->from_entity_copy),
                               std::ref(*config->to_copy),
                               exc_ptr));
+
   threads.emplace_back(thread(loading_animation, std::ref(working), exc_ptr, std::ref(*config->logger)));
 
   for (auto &th : threads)

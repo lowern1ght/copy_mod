@@ -1,15 +1,10 @@
-#pragma pack copy_mod
-
 #include <map>
 #include <string>
-#include <iostream>
 #include <algorithm>
 #include <copy_mod.h>
 #include <filesystem>
 #include <copy_config.h>
 #include <define_param.h>
-
-const char SYMBOL_SEPARATE = '=';
 
 using std::map;
 using std::pair;
@@ -100,7 +95,7 @@ to_upper(const string& str) {
 /// \return
 long long
 get_int_from_argument(const string& arg) {
-  if (arg == STRING_EMPTY) {
+  if (arg.empty()) {
     return 0;
   }
 
@@ -125,7 +120,7 @@ get_int_from_argument(const string& arg) {
     type_dt = 3;
   }
 
-  string digits = STRING_EMPTY;
+  string digits;
   for (auto ch : upper_str) {
     if (isdigit(ch)) {
       digits += ch;
@@ -203,11 +198,11 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
       logger->write_message("wrong path to _entity_", logger_type::error);
     }
 
-    if (!std::filesystem::exists(*path_from_copy)) {
-      logger->write_message("the creature that needs to be copied has not been found", error);
+    if (path_from_copy == nullptr && !std::filesystem::exists(*path_from_copy)) {
+      logger->write_message("path from copy not exists or unavailable \"" + path_from_copy->string() + "\"", error);
     }
   } else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
-    logger->write_message(" the creature that needs to be copied has not been found", error);
+    logger->write_message("argument [" + PARAM_NAME_COPY_FROM + "] specified more than once.", error);
   }
 
   if (path_from_copy != nullptr) {
@@ -218,7 +213,7 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
 
   path *path_to_copy = nullptr;
 
-  if (arguments.count(PARAM_NAME_COPY_TO) == 1) {
+  if (arguments.count(PARAM_NAME_COPY_TO) >= 1) {
     path_to_copy = new path(arguments.find(PARAM_NAME_COPY_TO)->second);
     if (std::filesystem::exists(*path_to_copy)) {
       config->to_copy = path_to_copy;
@@ -227,7 +222,8 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
     else if (arguments.count(PARAM_NAME_COPY_TO) > 1) {
       logger->write_message("argument [" + PARAM_NAME_COPY_TO + "] specified more than once.", error);
     } else {
-      logger->write_message("end point to copy is bad path", error);
+      std::filesystem::create_directories(*path_to_copy);
+      logger->write_message("end point \"" + path_to_copy->string() +"\" to copy not exists, directory be create", warning);
     }
   }
 
@@ -257,7 +253,6 @@ main(int argc, char *argv[]) {
     config = get_config_from_arguments(arguments, logger); //get config
   }
   catch (exception const &error) {
-    std::cout << error.what() << '\n';
     return EXIT_FAILURE;
   }
 

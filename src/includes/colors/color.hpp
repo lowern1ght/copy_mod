@@ -8,7 +8,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <Windows.h>
+#include <windows.h>
 
 namespace hue
 {
@@ -458,7 +458,8 @@ namespace dye
     template<typename T> class item;
 
     template<typename T>
-    class colorful : private std::list<item<T>>, public std::basic_string {
+    class colorful : private std::list<item<T>>
+    {
     public:
         using std::list<item<T>>::list;
 
