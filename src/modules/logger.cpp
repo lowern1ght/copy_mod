@@ -73,11 +73,8 @@ logger::write_message(string message, logger_type type, bool pwrite_to_console) 
     throw copy_exception(message);
   }
 }
-void logger::log_to_console(std::string BasicString, logger_type Type) {
 
-}
-
-void log_to_console(const std::string &str, logger_type type) {
+void logger::log_to_console(const std::string &str, logger_type type) {
   if (type == error) {
     std::cout << dye::red(str) << "\n";
   }
