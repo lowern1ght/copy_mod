@@ -7,12 +7,11 @@ file(GLOB SOURCES
         ../src/*.cpp
         ../src/headers/*.h
         ../src/includes/*
-        ../src/includes/colors/*
         ../src/modules/*.cpp)
 
 include_directories(modules headers includes)
 
-add_executable(copy_mod ${SOURCES} includes/colors/color.hpp)
+add_executable(copy_mod ${SOURCES} includes/color.hpp)
 
 find_package(OpenSSL REQUIRED)
 if (OpenSSL_FOUND)

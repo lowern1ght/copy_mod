@@ -8,13 +8,17 @@
 #include <cstdlib>
 #include <iostream>
 #include <copy_config.h>
+#include <progressbar.hpp>
 
 class copy_mod {
 private:
   copy_config *config;
-
   static void
-  loading_animation(const bool &working, std::exception_ptr *exc_p, logger &logger);
+  loading_animation(const bool &working,
+                                std::exception_ptr *exc_p,
+                                logger &logger,
+                                std::filesystem::path& path_to,
+                                std::filesystem::path& path_from);
 private:
   void
   check_values_hash(path *pth_to, path *pth_from);
@@ -28,7 +32,7 @@ public:
 
 class copy_exception : public std::exception {
 public:
-  copy_exception(std::string &msg) throw();
+  explicit copy_exception(std::string &msg) throw();
 
   [[nodiscard]] const char *
   what() const override;

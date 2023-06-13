@@ -8,7 +8,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <windows.h>
+#include <Windows.h>
 
 namespace hue
 {

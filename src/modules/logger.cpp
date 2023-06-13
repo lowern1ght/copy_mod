@@ -11,7 +11,7 @@
 #include <copy_mod.h>
 #include <define_param.h>
 
-#include <colors/color.hpp>
+#include "color.hpp"
 
 using namespace std::chrono;
 using namespace std::filesystem;

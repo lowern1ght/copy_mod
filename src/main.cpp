@@ -1,3 +1,38 @@
+// MIT License
+//
+// Copyright (c) 2023 Alexander Sergeev
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+//     of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+//     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//     copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+//     copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+// ==============================================================================
+//                                                            | |
+//                ___ ___  _ __  _   _     _ __ ___   ___   __| |
+//               / __/ _ \| '_ \| | | |   | '_ ` _ \ / _ \ / _` |
+//              | (_| (_) | |_) | |_| |   | | | | | | (_) | (_| |
+//               \___\___/| .__/ \__, |   |_| |_| |_|\___/ \__,_|
+//                        | |     __/ |_____
+//                        |_|    |___/______|
+//
+//  * Windows application copy filer or directory with integrated logger
+//  * Author: @lowern1ght
+//
+
 #include <map>
 #include <string>
 #include <algorithm>
@@ -198,8 +233,8 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
       logger->write_message("wrong path to _entity_", logger_type::error);
     }
 
-    if (path_from_copy == nullptr && !std::filesystem::exists(*path_from_copy)) {
-      logger->write_message("path from copy not exists or unavailable \"" + path_from_copy->string() + "\"", error);
+    if (path_from_copy == nullptr || !std::filesystem::exists(*path_from_copy)) {
+      logger->write_message("path from copy not exists or unavailable \"" + (path_from_copy != nullptr ? path_from_copy->string() : "<bad_path>") + "\"", error);
     }
   } else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
     logger->write_message("argument [" + PARAM_NAME_COPY_FROM + "] specified more than once.", error);
