@@ -8,25 +8,24 @@
 #include <filesystem>
 #include <openssl/md5.h>
 
-using namespace std;
-using namespace filesystem;
+using namespace std::filesystem;
 
 class controller {
 public:
-  string static
+  std::string static
   get_hash_summary(const path &entity);
 
-  string static
+  std::string static
   get_byte_entity(const path &entity);
 };
 
-string
+std::string
 controller::get_hash_summary(const path &entity) {
   unsigned char hash[MD5_DIGEST_LENGTH];
 
-  if (filesystem::is_directory(entity)) {
-    for (auto entity : filesystem::recursive_directory_iterator()) {
-      cout << "entity: " << entity.path().filename() << " | is directory: " << entity.is_directory() << '\n';
+  if (std::filesystem::is_directory(entity)) {
+    for (auto entity : std::filesystem::recursive_directory_iterator()) {
+      std::cout << "entity: " << entity.path().filename() << " | is directory: " << entity.is_directory() << '\n';
     }
   } else {
     auto bytes = get_byte_entity(entity);
@@ -35,7 +34,7 @@ controller::get_hash_summary(const path &entity) {
   return "";
 }
 
-string
+std::string
 controller::get_byte_entity(const path &entity) {
 
   std::ifstream ifs(entity.c_str(), std::ios::ate | std::ios::binary);

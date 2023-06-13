@@ -1,3 +1,5 @@
+#pragma pack copy_mod
+
 /*
  * application: copy_mod
  *
@@ -16,10 +18,15 @@
 
 const char SYMBOL_SEPARATE = '=';
 
-using namespace std;
-using namespace filesystem;
+using std::map;
+using std::pair;
+using std::string;
+using std::iostream;
+using std::exception;
+using std::exception_ptr;
+using namespace std::filesystem;
 
-string
+std::string
 clear_string(const string &str, char symbol_remove = '"') {
   string result;
 
@@ -32,10 +39,10 @@ clear_string(const string &str, char symbol_remove = '"') {
   return result;
 }
 
-pair<string, string> *
-get_pair_from_string(const string arg)
+std::pair<string, string> *
+get_pair_from_string(const string& arg)
 noexcept {
-  string first = DSTRING_EMPTY, second = DSTRING_EMPTY;
+  string first, second;
 
   for (
       int i = 0;
@@ -52,7 +59,7 @@ noexcept {
     }
   }
 
-  if (first == DSTRING_EMPTY) {
+  if (first.empty()) {
     first = arg;
   }
 
@@ -62,8 +69,7 @@ noexcept {
       first == PARAM_NAME_ROTATION ||
       first == PARAM_NAME_LOG) {
     return new
-        pair<string, string>(first, second
-                                        != DSTRING_EMPTY ?
+        pair<string, string>(first, !second.empty() ?
                                     clear_string(second)
                                                          : second);
   } else {
@@ -89,10 +95,10 @@ noexcept {
 }
 
 string
-to_upper(const string str) {
-  string str_t = "";
-  for (int i = 0; i < str.length(); ++i) {
-    str_t += toupper(str[i]);
+to_upper(const string& str) {
+  string str_t;
+  for (char i : str) {
+    str_t += toupper(i);
   }
   return str_t;
 }
@@ -100,7 +106,7 @@ to_upper(const string str) {
 /// \param arg
 /// \return
 long long
-get_int_from_argument(string arg) {
+get_int_from_argument(const string& arg) {
   if (arg == STRING_EMPTY) {
     return 0;
   }
@@ -111,18 +117,18 @@ get_int_from_argument(string arg) {
 
   auto find_gb = upper_str.find(ROTATION_GB);
   if (find_gb != std::string::npos) {
-    upper_str.replace(upper_str.find(ROTATION_GB), sizeof(ROTATION_GB) - 1, DSTRING_EMPTY);
+    upper_str.replace(upper_str.find(ROTATION_GB), sizeof(ROTATION_GB.size()) - 1, DSTRING_EMPTY);
   }
 
   auto find_mb = upper_str.find(ROTATION_MB);
   if (find_mb != std::string::npos) {
-    upper_str.replace(upper_str.find(ROTATION_MB), sizeof(ROTATION_MB) - 1, DSTRING_EMPTY);
+    upper_str.replace(upper_str.find(ROTATION_MB), sizeof(ROTATION_MB.size()) - 1, DSTRING_EMPTY);
     type_dt = 2;
   }
 
   auto find_kb = upper_str.find(ROTATION_KB);
   if (find_kb != std::string::npos) {
-    upper_str.replace(upper_str.find(ROTATION_KB), sizeof(ROTATION_KB) - 1, DSTRING_EMPTY);
+    upper_str.replace(upper_str.find(ROTATION_KB), sizeof(ROTATION_KB.size()) - 1, DSTRING_EMPTY);
     type_dt = 3;
   }
 
@@ -133,13 +139,14 @@ get_int_from_argument(string arg) {
     }
   }
 
-  long long arg_int = (long long) stoi(digits);
+  auto arg_int = (long long) stoi(digits);
 
   long long gb_convert = 1073741824;
   long long mb_convert = 1048576;
   long long kb_convert = 1024;
 
-  long long result = 0;
+  long long result = NULL;
+
   switch (type_dt) {
   case 1:result = arg_int * gb_convert;
     break;
@@ -147,6 +154,7 @@ get_int_from_argument(string arg) {
     break;
   case 3:result = arg_int * kb_convert;
     break;
+  default:break;
   }
 
   return result;
@@ -163,6 +171,7 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
   // ===============================================================================================
 
   path *path_to_log_file = nullptr;
+  long long rotation_max_size = 2097152; //default 2MB
 
   if (arguments.count(PARAM_NAME_LOG) == 1) {
     auto lg_file_value = arguments.find(PARAM_NAME_LOG)->second;
@@ -173,7 +182,6 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
 
     path_to_log_file = new path(current_path() / lg_file_value);
 
-    long long rotation_max_size = 2097152; //default 2MB
     if (arguments.count(PARAM_NAME_ROTATION) == 1) {
       rotation_max_size = get_int_from_argument(arguments.find(PARAM_NAME_ROTATION)->second);
     }
@@ -181,7 +189,13 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
     logger = new class logger(path_to_log_file, true, rotation_max_size);
     config->logger = logger;
   } else if (arguments.count(PARAM_NAME_LOG) > 1) {
-    logger->write_message("*** Argument [\" + PARAM_NAME_LOG + \"] specified more than once.", error);
+    if (logger != nullptr) {
+      logger->write_message("argument [" + PARAM_NAME_LOG + "] specified more than once.", error);
+    }
+  }
+
+  if (logger == nullptr) {
+    logger = new class logger(nullptr, true, rotation_max_size);
   }
 
   // ===============================================================================================
@@ -193,14 +207,14 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
       path_from_copy = new path(arguments.find(PARAM_NAME_COPY_FROM)->second);
     }
     catch (exception const &exception) {
-      logger->write_message(" *** Wrong path to _entity_ *** ", logger_type::error);
+      logger->write_message("wrong path to _entity_", logger_type::error);
     }
 
-    if (!filesystem::exists(*path_from_copy)) {
-      logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
+    if (!std::filesystem::exists(*path_from_copy)) {
+      logger->write_message("the creature that needs to be copied has not been found", error);
     }
   } else if (arguments.count(PARAM_NAME_COPY_FROM) > 1) {
-    logger->write_message(" *** the creature that needs to be copied has not been found *** ", error);
+    logger->write_message(" the creature that needs to be copied has not been found", error);
   }
 
   if (path_from_copy != nullptr) {
@@ -213,14 +227,14 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
 
   if (arguments.count(PARAM_NAME_COPY_TO) == 1) {
     path_to_copy = new path(arguments.find(PARAM_NAME_COPY_TO)->second);
-    if (filesystem::exists(*path_to_copy)) {
+    if (std::filesystem::exists(*path_to_copy)) {
       config->to_copy = path_to_copy;
     }
       //Todo: реализовать копирование в несколько папок (directories)
     else if (arguments.count(PARAM_NAME_COPY_TO) > 1) {
-      logger->write_message(" *** Argument [" + PARAM_NAME_COPY_TO + "] specified more than once. *** ", error);
+      logger->write_message("argument [" + PARAM_NAME_COPY_TO + "] specified more than once.", error);
     } else {
-      logger->write_message("*** End point to copy is bad path ***", error);
+      logger->write_message("end point to copy is bad path", error);
     }
   }
 
@@ -230,9 +244,9 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
   if (arguments.count(PARAM_NAME_CHECK_ON) == 1) {
     config->check_hash = new bool(true);
   } else if (arguments.count(PARAM_NAME_CHECK_ON) > 1) {
-    logger->write_message("*** Argument [" + PARAM_NAME_CHECK_ON + "] specified more than once.", error);
+    logger->write_message("argument [" + PARAM_NAME_CHECK_ON + "] specified more than once.", error);
   } else {
-    config->check_hash = false;
+    config->check_hash = nullptr;
   }
 
   return config;
@@ -249,8 +263,8 @@ main(int argc, char *argv[]) {
   try {
     config = get_config_from_arguments(arguments, logger); //get config
   }
-  catch (exception const error) {
-    cout << error.what() << '\n';
+  catch (exception const &error) {
+    std::cout << error.what() << '\n';
     return EXIT_FAILURE;
   }
 

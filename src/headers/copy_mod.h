@@ -5,18 +5,16 @@
 #ifndef COPY_MOD_SRC_MODULES_COPY_MOD_H
 #define COPY_MOD_SRC_MODULES_COPY_MOD_H
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <copy_config.h>
-
-using namespace std;
 
 class copy_mod {
 private:
   copy_config *config;
 
   static void
-  loading_animation(const bool &working, exception_ptr *exc_p, logger &logger);
+  loading_animation(const bool &working, std::exception_ptr *exc_p, logger &logger);
 private:
   void
   check_values_hash(path *pth_to, path *pth_from);
@@ -28,9 +26,9 @@ public:
   start_copy();
 };
 
-class copy_exception : public exception {
+class copy_exception : public std::exception {
 public:
-  copy_exception(string &msg) throw();
+  copy_exception(std::string &msg) throw();
 
   [[nodiscard]] const char *
   what() const override;

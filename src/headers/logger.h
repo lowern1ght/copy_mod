@@ -7,8 +7,7 @@
 
 #include <filesystem>
 
-using namespace std;
-using namespace filesystem;
+using namespace std::filesystem;
 
 enum logger_type {
   error, info, warning
@@ -24,13 +23,13 @@ private:
   check_log_file_size_and_clean();
 
 public:
-  logger(path *path_to_logger_file, bool write_to_console, int rotation_size);
+  logger(path *path_to_logger_file, bool write_to_console, long long rotation_size);
 public:
   void
-  write_message(string message, logger_type type, bool pwrite_to_console = true);
+  write_message(std::string message, logger_type type, bool pwrite_to_console = true);
 };
 
-string
+std::string
 get_enum_name(logger_type type);
 
 #endif //COPY_MOD_SRC_MODULES_LOGGER_H

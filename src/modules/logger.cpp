@@ -4,9 +4,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <cmath>
-#include <algorithm>
-#include <chrono>
 #include <ctime>
 #include <string>
 #include <sstream>
@@ -14,11 +11,10 @@
 #include <copy_mod.h>
 #include <define_param.h>
 
-using namespace std;
-using namespace chrono;
-using namespace filesystem;
+using namespace std::chrono;
+using namespace std::filesystem;
 
-logger::logger(path *path_to_logger_file, bool write_to_console = true, int rotation_size = 1073741824) {
+logger::logger(path *path_to_logger_file, bool write_to_console = true, long long rotation_size = 1073741824) {
   this->write_to_console = write_to_console;
   this->rotation_size = rotation_size;
 
@@ -60,20 +56,31 @@ logger::write_message(string message, logger_type type, bool pwrite_to_console) 
 
   string log_message = oss.str();
 
-  if (type == error) {
-    throw copy_exception(message);
-  }
-
   if (write_to_console && pwrite_to_console) {
     //write only message without time and log type
-    cout << message << '\n';
+
+    if (type == error) {
+      std::cout << dye::red(message) << "\n";
+    }
+
+    if (type == warning) {
+      std::cout << dye::yellow(message) << "\n";
+    }
+
+    if (type == info) {
+      std::cout << message << '\n';
+    }
   }
 
   if (path_to_logger_file != nullptr) {
     check_log_file_size_and_clean();
 
-    ofstream out_file(*path_to_logger_file, ios::app);
+    std::ofstream out_file(*path_to_logger_file, std::ios::app);
     out_file << log_message;
     out_file.close();
+  }
+
+  if (type == error) {
+    throw copy_exception(message);
   }
 }

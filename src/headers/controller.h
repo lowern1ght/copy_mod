@@ -11,15 +11,14 @@
 #include <filesystem>
 #include <openssl/md5.h>
 
-using namespace std;
-using namespace filesystem;
+using namespace std::filesystem;
 
 class controller {
 public:
-  string static
+  std::string static
   get_hash_summary(const path &entity);
 
-  string static
+  std::string static
   get_byte_entity(const path &entity);
 };
 

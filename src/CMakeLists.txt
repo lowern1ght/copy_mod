@@ -6,11 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB SOURCES
         ../src/*.cpp
         ../src/headers/*.h
+        ../src/includes/colors/*
         ../src/modules/*.cpp)
 
-include_directories(modules headers)
+include_directories(modules headers includes)
 
-add_executable(copy_mod ${SOURCES})
+add_executable(copy_mod ${SOURCES} includes/colors/color.hpp)
 
 find_package(OpenSSL REQUIRED)
 if (OpenSSL_FOUND)
@@ -19,5 +20,3 @@ if (OpenSSL_FOUND)
 endif ()
 
 set_target_properties(PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

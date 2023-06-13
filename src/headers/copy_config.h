@@ -8,8 +8,7 @@
 #include <logger.h>
 #include <filesystem>
 
-using namespace std;
-using namespace filesystem;
+using namespace std::filesystem;
 
 class copy_config {
 public:

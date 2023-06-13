@@ -3,14 +3,16 @@
 //
 
 #include <string>
-#include <conio.h>
 #include <thread>
-#include <colors.h>
+#include <iostream>
 #include <copy_mod.h>
+#include "colors/color.hpp"
 #include <filesystem>
 
-using namespace std;
-using namespace filesystem;
+using std::string;
+using std::thread;
+
+using namespace std::filesystem;
 
 copy_exception::copy_exception(std::string &msg) throw()
     : exception(msg.c_str()) {
@@ -23,20 +25,7 @@ copy_exception::what() const {
 
 void
 copy_mod::check_values_hash(path *pth_to, path *pth_from) {
-  config->logger->write_message(" **** Begin check HASH *** \n", info);
-
-  return; // developing...
-
-  if (is_directory(*pth_to)) {
-    for (auto entity_from : recursive_directory_iterator(*pth_from)) {
-      for (auto entity_to : recursive_directory_iterator(*pth_to)) {
-        cout << hash_value(entity_from.path()) << " | " << hash_value(entity_to.path()) << '\n';
-      }
-    }
-  } else {
-    cout << hash_value(*pth_to) << " | " << hash_value(*pth_from) << '\n';
-  }
-
+  config->logger->write_message("begin check HASH\n", info);
 }
 
 int
@@ -63,41 +52,43 @@ get_directory_name(path *pth) {
 }
 
 void
-copy_mod::loading_animation(const bool &working, exception_ptr *exc_p, logger &logger) {
-  cout << '\n' << " --- Copy  ";
+copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p, logger &logger) {
+  std::cout << '\n' << "copy  ";
+
+  using namespace std;
 
   while (working) {
     this_thread::sleep_for(0.8s);
-    cout << "\b\\" << flush;
+    cout << "\b\\" << std::flush;
     this_thread::sleep_for(0.8s);
-    cout << "\b|" << flush;
+    cout << "\b|" << std::flush;
     this_thread::sleep_for(0.8s);
-    cout << "\b/" << flush;
+    cout << "\b/" << std::flush;
     this_thread::sleep_for(0.8s);
-    cout << "\b-" << flush;
+    cout << "\b-" << std::flush;
   }
 
   try {
     if (exc_p != nullptr)
       rethrow_exception(*exc_p);
-    logger.write_message("copy is COMPLETE", info, false);
-    cout << "\b " << FGRN("COMPLETE") << " ---" << "\n";
+    logger.write_message("copy complete without exceptions", info, false);
+    cout << dye::green("\bcomplete") << "\n";
   }
   catch (exception &exception) {
-    logger.write_message("copy is FAILED with _message_ " + to_string(*exception.what()), info, false);
-    cout << "\b " << FRED("ERROR") << ", " << exception.what() << " ---" << "\n";
+    logger.write_message("copy failed with message " + to_string(*exception.what()), info, false);
+    std::cout << dye::red("\bfailed with exception") << ": " << exception.what() << "\n";
   }
 }
 
 void
-complete_copy(bool &working, path &path_from, path &path_to, exception_ptr *exception_ptr) {
+complete_copy(bool &working, path &path_from, path &path_to, std::exception_ptr *exception_ptr) {
   working = true;
 
   try {
-    filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive);
+    std::filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive);
   }
   catch (...) {
-    *exception_ptr = current_exception();
+    *exception_ptr = std::current_exception();
   }
 
   working = false;
@@ -114,24 +105,24 @@ copy_mod::start_copy() {
                    ? "folder " + get_directory_name(config->from_entity_copy)
                    : "file " + config->from_entity_copy->filename().string();
 
-  this->config->logger->write_message(" --- Begin copy (" + that_copy + ") to " + config->to_copy->string(), info);
+  this->config->logger->write_message("begin copy (" + that_copy + ") to " + config->to_copy->string(), info);
 
   auto working = true;
-  exception_ptr *exc_ptr = nullptr;
+  std::exception_ptr *exc_ptr = nullptr;
 
-  vector<thread> threads;
+  std::vector<thread> threads;
 
   threads.emplace_back(thread(complete_copy,
                               std::ref(working),
-                              ref(*config->from_entity_copy),
-                              ref(*config->to_copy),
+                              std::ref(*config->from_entity_copy),
+                              std::ref(*config->to_copy),
                               exc_ptr));
-  threads.emplace_back(thread(loading_animation, ref(working), exc_ptr, ref(*config->logger)));
+  threads.emplace_back(thread(loading_animation, std::ref(working), exc_ptr, std::ref(*config->logger)));
 
   for (auto &th : threads)
     th.join();
 
-  if (config->check_hash) {
+  if (config->check_hash != nullptr && config->check_hash) {
     check_values_hash(config->from_entity_copy, config->to_copy);
   }
 }

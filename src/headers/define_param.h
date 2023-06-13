@@ -4,6 +4,8 @@
 
 #define DSTRING_EMPTY ""
 
+using std::string;
+
 const string STRING_EMPTY = "";
 
 //ARGUMENTS
