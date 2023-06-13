@@ -76,15 +76,27 @@ void copy_mod::loading_animation(const bool &working,
       count_full += 1;
     }
 
-    progressbar pgrbar(count_full);
-    pgrbar.set_todo_char(" ");
-    pgrbar.set_done_char("█");
+    progressbar pgrbar(100);
+    pgrbar.set_todo_char("_");
+    pgrbar.set_done_char("#");
+    pgrbar.show_bar();
 
     while(true) {
+      int last_percent, cur_percent;
+      int on_percent = count_full / 100;
+
       std::vector<string> ready_copy;
       for (const auto& entity_to : std::filesystem::recursive_directory_iterator(path_to)) {
-        if (std::find(ready_copy.begin(), ready_copy.end(), entity_to.path().string()) != ready_copy.end() )
-          ready_copy.push_back(entity_to.path().string());
+        if (std::find(ready_copy.begin(), ready_copy.end(), entity_to.path().string()) == ready_copy.end()) {
+          auto path_str = entity_to.path().string();
+          ready_copy.push_back(path_str);
+        }
+
+        cur_percent = (int)ready_copy.capacity() / count_full;
+        if(last_percent <= cur_percent && cur_percent <= 1) {
+          last_percent = count_full;
+          pgrbar.update();
+        }
       }
 
       if (ready_copy.capacity() == count_full) {
@@ -94,8 +106,8 @@ void copy_mod::loading_animation(const bool &working,
   }
   else {
     progressbar pgrbar(1);
-    pgrbar.set_todo_char(" ");
-    pgrbar.set_done_char("█");
+    pgrbar.set_todo_char("_");
+    pgrbar.set_done_char("#");
 
     auto path_result = path_to / path_from.filename();
     while (true) {

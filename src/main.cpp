@@ -35,6 +35,7 @@
 
 #include <map>
 #include <string>
+#include <thread>
 #include <algorithm>
 #include <copy_mod.h>
 #include <filesystem>
@@ -259,6 +260,19 @@ get_config_from_arguments(map<string, string> &arguments, logger *logger) {
     } else {
       std::filesystem::create_directories(*path_to_copy);
       logger->write_message("end point \"" + path_to_copy->string() +"\" to copy not exists, directory be create", warning);
+
+      using namespace std;
+
+      auto ate = 1;
+      while(true) {
+        std::this_thread::sleep_for(0.2s);
+
+        if(ate >= 2 || exists(*path_to_copy)) {
+          break;
+        }
+
+        ate += 1;
+      }
     }
   }
 

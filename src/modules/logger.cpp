@@ -80,7 +80,7 @@ void split_by_char(std::string const &str, const char* delim, std::vector<std::s
   char *token = strtok(const_cast<char*>(str.c_str()), delim);
   while (token != nullptr)
   {
-    out.push_back(std::string(token));
+    out.emplace_back(token);
     token = strtok(nullptr, delim);
   }
 }
