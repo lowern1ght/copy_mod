@@ -82,14 +82,18 @@ void copy_mod::loading_animation(const bool &working, const std::exception_ptr *
   if (is_directory(path_to)) {
     copy_total_count = 0;
 
-    for (const auto& entity : recursive_directory_iterator(path_from)) {
-      copy_files_size += entity.file_size();
-      copy_total_count += 1;
+    for (const auto& entity_to : recursive_directory_iterator(path_to)) {
+      for (const auto &entity_from : recursive_directory_iterator(path_from)) {
+        if (entity_to.path().filename().string() == entity_from.path().filename().string()) {
+          copy_files_size += entity_from.file_size();
+          copy_total_count += 1;
+        }
+      }
     }
 
     ProgressBar pgrsbar{
         option::BarWidth{50},
-        option::Start{"["},
+        option::Start{"\r["},
         option::End{"]"},
         option::ForegroundColor{Color::white},
         option::FontStyles{std::vector<FontStyle>{FontStyle::bold}}
@@ -124,7 +128,7 @@ void copy_mod::loading_animation(const bool &working, const std::exception_ptr *
       pgrsbar.set_option(option::PostfixText{ std::to_string(current_percent) + "%" });
       pgrsbar.set_progress(current_percent);
 
-      if (copy_files_size == byte_current /* && copy_total_count == copy_complete_count*/) {
+      if (copy_files_size <= byte_current /* && copy_total_count == copy_complete_count*/) {
         pgrsbar.set_option(option::PostfixText { "file complete copy to" + path_to.string() });
 
         std::cout << termcolor::bold << termcolor::green
