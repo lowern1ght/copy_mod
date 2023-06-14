@@ -8,7 +8,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <copy_config.h>
-#include <progressbar.hpp>
+#include <indicators/progress_bar.hpp>
+#include <indicators/cursor_control.hpp>
+#include <indicators/block_progress_bar.hpp>
 
 class copy_mod {
 private:

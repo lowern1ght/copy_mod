@@ -19,4 +19,10 @@ if (OpenSSL_FOUND)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenSSL_LIBRARIES})
 endif ()
 
+find_package(indicators REQUIRED)
+if (indicators_FOUND)
+    include_directories(${indicators_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${indicators_LIBARIES})
+endif ()
+
 set_target_properties(PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")

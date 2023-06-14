@@ -4,14 +4,14 @@
 
 #include <string>
 #include <thread>
-#include <iostream>
-#include <Windows.h>
 #include <copy_mod.h>
 #include <filesystem>
 
 using std::string;
 using namespace std::filesystem;
 using namespace std::chrono_literals;
+
+unsigned long long in_folder_to_size = 0;
 
 copy_exception::copy_exception(std::string &msg) throw()
     : exception(msg.c_str()) {
@@ -64,56 +64,85 @@ complete_copy(bool &working, path &path_from, path &path_to, std::exception_ptr 
   working = false;
 }
 
-void copy_mod::loading_animation(const bool &working,
-                                 std::exception_ptr *exc_p,
-                                 logger &logger,
-                                 path &path_to,
-                                 path &path_from) {
-  if (is_directory(path_from)) {
-    unsigned long long full_size = 0;
-    for (auto ent : std::filesystem::recursive_directory_iterator(path_from)) {
-      full_size += ent.file_size();
+void copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p, logger &logger, path &path_to, path &path_from) {
+
+  using std::vector;
+  using namespace indicators;
+
+  std::cout
+    << "\n"
+    << termcolor::bold << termcolor::bright_yellow << " processing... "<< termcolor::reset
+    << "\n";
+
+  show_console_cursor(false);
+
+  int copy_total_count = 1;
+  unsigned long long copy_files_size = 0;
+
+  if (is_directory(path_to)) {
+
+    copy_total_count = 0;
+
+    for (const auto& entity : recursive_directory_iterator(path_from)) {
+      copy_files_size += entity.file_size();
+      copy_total_count += 1;
     }
 
-    unsigned long long on_percent = full_size * 0.01;
+    ProgressBar pgrsbar{
+        option::BarWidth{80},
+        option::Start{"["},
+        option::End{"]"},
+        option::ForegroundColor{Color::white},
+        option::FontStyles{std::vector<FontStyle>{FontStyle::bold}}
+    };
 
-    progressbar pgrbar(100);
-    pgrbar.set_todo_char("_");
-    pgrbar.set_done_char("#");
-    pgrbar.show_bar();
+    //size_t copy_complete_count = 0;
+    auto last_percent = 0;
+    unsigned long long byte_current = 0;
 
-    size_t iter = 0;
-    unsigned long long last_files_size = 0;
     while(true) {
-      if (last_files_size == full_size) {
+      byte_current = 0;
+      for (const auto& entity : recursive_directory_iterator(path_to)) {
+        for (const auto& entity_from : recursive_directory_iterator(path_from)) {
+          if (entity.path().filename().string() == entity_from.path().filename().string()) {
+            byte_current += entity.file_size();
+          }
+        }
+      }
+
+      if (exc_p != nullptr) { //if exception in main thread, throw exception and break loading bar;
+        show_console_cursor(true);
+
+        std::cout << termcolor::bold << termcolor::red
+                  << " - copy failed!\n" << termcolor::reset;
+
+        std::rethrow_exception(*exc_p);
+      }
+
+      auto n1 = (float)byte_current / (float)copy_files_size * 100;
+      auto current_percent = static_cast<int>(std::round(n1));
+
+      pgrsbar.set_option(option::PostfixText{ std::to_string(current_percent) + "%" });
+      pgrsbar.set_progress(current_percent);
+
+      if (copy_files_size == byte_current /* && copy_total_count == copy_complete_count*/) {
+        pgrsbar.set_option(option::PostfixText { "file complete copy to" + path_to.string() });
+
+        std::cout << termcolor::bold << termcolor::green
+                  << " - copy successes!\n" << termcolor::reset;
+
         break;
       }
 
-      unsigned long long current_files_size = 0;
-      for (const auto& entity_to : std::filesystem::recursive_directory_iterator(path_to)) {
-        current_files_size += entity_to.file_size();
-      }
-
-      if (iter < 100 && current_files_size - last_files_size > on_percent) {
-        pgrbar.update();
-      }
-
-      last_files_size = current_files_size;
-    }
-
-    pgrbar.show_bar(false);
-  }
-  else {
-    progressbar pgrbar(100);
-    pgrbar.set_todo_char("_");
-    pgrbar.set_done_char("#");
-
-    unsigned long long size_to = file_size(path_to);
-    while (true) {
-      //Todo: прогресс по файлу
-      break;
+      //timeout
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
+
+  std::cout << '\n';
+
+  // Show cursor
+  show_console_cursor(true);
 }
 
 
