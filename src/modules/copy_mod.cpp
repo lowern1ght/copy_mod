@@ -56,6 +56,7 @@ complete_copy(bool &working, path &path_from, path &path_to, std::exception_ptr 
 
   try {
     std::filesystem::copy(path_from, path_to, copy_options::overwrite_existing | copy_options::recursive);
+
   }
   catch (...) {
     *exception_ptr = std::current_exception();
@@ -64,8 +65,7 @@ complete_copy(bool &working, path &path_from, path &path_to, std::exception_ptr 
   working = false;
 }
 
-void copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p, logger &logger, path &path_to, path &path_from) {
-
+void copy_mod::loading_animation(const bool &working, const std::exception_ptr *exc_p, logger &logger, path &path_to, path &path_from) {
   using std::vector;
   using namespace indicators;
 
@@ -80,7 +80,6 @@ void copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p,
   unsigned long long copy_files_size = 0;
 
   if (is_directory(path_to)) {
-
     copy_total_count = 0;
 
     for (const auto& entity : recursive_directory_iterator(path_from)) {
@@ -89,7 +88,7 @@ void copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p,
     }
 
     ProgressBar pgrsbar{
-        option::BarWidth{80},
+        option::BarWidth{50},
         option::Start{"["},
         option::End{"]"},
         option::ForegroundColor{Color::white},
@@ -144,7 +143,6 @@ void copy_mod::loading_animation(const bool &working, std::exception_ptr *exc_p,
   // Show cursor
   show_console_cursor(true);
 }
-
 
 void
 copy_mod::start_copy() {

@@ -17,7 +17,7 @@ private:
   copy_config *config;
   static void
   loading_animation(const bool &working,
-                                std::exception_ptr *exc_p,
+                                const std::exception_ptr *exc_p,
                                 logger &logger,
                                 std::filesystem::path& path_to,
                                 std::filesystem::path& path_from);
